@@ -3,22 +3,22 @@ require_once __DIR__.'/../klase/Tabela.php';
 require_once __DIR__.'/../klase/Suosnivac.php';
 require_once __DIR__.'/../klase/Predstavnik.php';
 require_once __DIR__.'/../klase/Uplate.php';
-require_once __DIR__.'/../klase/Predracuni.php';
+require_once __DIR__.'/../klase/Racuni.php';
 require_once __DIR__.'/../klase/Direktor.php';
 require_once __DIR__.'/../klase/Clanarina.php';
 
 
 $id = $_POST['id'];
-$br_predracuna = $_POST['br'];
+$br_racuna = $_POST['br'];
 $suos = $_POST['suos'];
 $id_uplata = $_POST['iduplata'];
 $iznos = Clanarina::getClanarinu()->iznos;
-
+$datum_uplate = Uplate::getUplatuPoId($id_uplata)->datum;
 $suosnivac = Suosnivac::getSuosnivac($id);
 
-$datum_predracuna = Predracuni::getAll($id_uplata);
-foreach ($datum_predracuna as $dat) {
-	$datum = $dat->datum_predracuna;
+$datum_racuna = Racuni::getAll($id_uplata);
+foreach ($datum_racuna as $dat) {
+	$datum = $dat->datum_racuna;
 	$uneo=$dat->uneo;
 }
 
@@ -61,7 +61,7 @@ $dompdf->setHttpContext($contxt);
 
 //include template
 ob_start();
-require_once('../dompdf/predracun.php');
+require_once('../dompdf/racun.php');
 $template = ob_get_clean();
 
 //$dompdf = new Dompdf();
@@ -76,8 +76,8 @@ $dompdf->render();
 //$dompdf->stream('invoice-'.$id);
 
 //write pdf to folder
-$url = 'pdfs/RNIDS-predračun-'.$br_predracuna.'-'.$suos.'-cl.pdf';
+$url = 'racuni/RNIDS-račun-'.$br_racuna.'-'.$suos.'-cl.pdf';
 file_put_contents($url, $dompdf->output());
 
-$generisi = Predracuni::updateGenerisanPredracun($url, $id_uplata);
-echo $generisi;
+$generisi = Racuni::updateGenerisanRacun($url, $id_uplata);
+//echo $generisi;

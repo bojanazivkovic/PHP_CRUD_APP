@@ -1,64 +1,64 @@
-<?php 
-require_once __DIR__.'/../klase/Tabela.php';
-require_once __DIR__.'/../klase/Suosnivac.php';
-require_once __DIR__.'/../klase/Predstavnik.php';
-require_once __DIR__.'/../klase/Konferencija.php';
-require_once __DIR__.'/../klase/Prisustvokonferenciji.php';
+<?php
+require_once __DIR__ . '/../klase/Tabela.php';
+require_once __DIR__ . '/../klase/Suosnivac.php';
+require_once __DIR__ . '/../klase/Predstavnik.php';
+require_once __DIR__ . '/../klase/Konferencija.php';
+require_once __DIR__ . '/../klase/Prisustvokonferenciji.php';
 
 $id_konf = $_POST['id'];
 $suosnivaci = Suosnivac::getAll();
 $sve_konferencije = Konferencija::getKonferencijuPoId($id_konf);
-$cirilLatin = new Tabela;            
+$cirilLatin = new Tabela;
 ?>
 <div class="row">
    <div class="col-lg-12">
             <div class="card">
             <div class="card-header"><b>Обележити присутне на "<?=$sve_konferencije->naziv?>" одржаној <?=date('d.m.Y', strtotime($sve_konferencije->datum))?>. у <?=$sve_konferencije->lokacija?></b></div>
-           <div class="col-lg-6"> 
+           <div class="col-lg-6">
             <div class="card-body">
 
-          <form method="post" action="inc/prisustvo_upis.php">
+
               <table class="table table-striped table-bordered table-hover" id="data-table">
               <thead>
                 <tr>
                   <th scope="col">#</th>
                   <th scope="col">Назив</th>
-                  <th scope="col"></th> 
+                  <th scope="col"></th>
                 </tr>
               </thead>
               <tbody>
-               <?php $redni_broj = 1;  
-               
-               foreach($suosnivaci as $s){ 
-                $ids = $s->id;
-                $sva_prisustva = Prisustvokonferenciji::getPrisustvokonferenciji($id_konf, $ids);
-                if($sva_prisustva !== null){
-                  $prisutan = $sva_prisustva->id_suosnivac;
-                }else {
-                  $prisutan = 0;
-                }
-              ?>              
+               <?php $redni_broj = 1;
+
+foreach ($suosnivaci as $s) {
+	$ids = $s->id;
+	$sva_prisustva = Prisustvokonferenciji::getPrisustvokonferenciji($id_konf, $ids);
+	if ($sva_prisustva !== null) {
+		$prisutan = $sva_prisustva->id_suosnivac;
+	} else {
+		$prisutan = 0;
+	}
+	?>
                <tr>
-                <td scope="col"><?php echo $redni_broj;?></td>
-                <td id="<?=$ids?>" ><label for="prisutan_<?=$ids?>" class="label-prisutan"><?=$cirilLatin->cirilLatin($s->naziv)?></label></td> 
+                <td scope="col"><?php echo $redni_broj; ?></td>
+                <td id="<?=$ids?>" ><label for="prisutan_<?=$ids?>" class="label-prisutan"><?=$cirilLatin->cirilLatin($s->naziv)?></label></td>
                 <td>
-                  <?php if($ids === $prisutan){?>
-                  <input type="checkbox" name="prisutan[]" id="prisutan_<?=$ids?>" value="<?=$ids?>" checked>
-                <?php }else{?>
-                  <input type="checkbox" name="prisutan[]" id="prisutan_<?=$ids?>" value="<?=$ids?>">
-               <?php  } ?> 
+                  <?php if ($ids === $prisutan) {?>
+                  <input type="checkbox" name="prisutan" id="prisutan_<?=$ids?>" value="<?=$ids?>" checked>
+                <?php } else {?>
+                  <input type="checkbox" name="prisutan" id="prisutan_<?=$ids?>" value="<?=$ids?>">
+               <?php }?>
               </td>
-               
-                <td hidden="hidden"><input type="text" name="id_konferencija" value="<?=$id_konf?>"></td>        
-              </tr>            
-              <?php $redni_broj++;} ?>
+
+                <td hidden="hidden"><input type="text" id="id_konferencija" name="id_konferencija" value="<?=$id_konf?>"></td>
+              </tr>
+              <?php $redni_broj++;}?>
             </tbody>
           </table>
-          <button type="submit" class="btn btn-lg btn-info btn-block izmeni-btn" name="submit">
+          <button type="submit" class="btn btn-lg btn-info izmeni-btn" name="submit" style="position:fixed;top:50%;right:15%;">
            <i class="fa fa-paper-plane-o fa-lg"></i>&nbsp;<span id="izmena-btn">Сними</span>
          </button>
+         <span id="success" style="position:fixed;top:60%;right:10%;">Успешно снимљено!</span>
 
-      </form>
             </div><!-- card-body -->
           </div>
         </div>
@@ -70,7 +70,7 @@ $cirilLatin = new Tabela;
 <br><br>
 <script>
   $(document).ready(function(){
-    
+
     $('#data-table').on('click', 'td', function() {
        $(this).css('background-color', '#ccc');
     });
@@ -117,6 +117,32 @@ function sortTable() {
 }
 
 sortTable();
-  
+
+$('#success').hide();
+$('.izmeni-btn').click(function(){
+
+  $('#success').show();
+  var konferencija = $('#id_konferencija').val();
+  var prisutan = [];
+  $.each($("input[name='prisutan']:checked"), function(){
+    prisutan.push($(this).val());
+  })
+  //console.log(prisutan);
+  $.ajax({
+          url:"inc/prisustvo_upis.php",
+          method:"POST",
+          data:{konferencija:konferencija, prisutan:prisutan},
+          success:function(data)
+          {
+               setTimeout(function(){
+                 if($('#success').length > 0){
+                  $('#success').hide();
+                }
+
+                },500);
+          }
+     });
+
+});
 
 </script>
