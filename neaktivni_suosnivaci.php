@@ -127,7 +127,7 @@
                 
                 success: function(data) {
                   $("#podaci").html(data);                 
-                  $('.page-title h1').html('<a href="svi_suosnivaci.php"><i class="fa fa-hand-o-left"></i> назад</a>');
+                  $('.page-title h1').html('<a href="neaktivni_suosnivaci.php"><i class="fa fa-hand-o-left"></i> назад</a>');
                   }
                 });
               $('.tabela').hide();

@@ -65,7 +65,7 @@
                 <?php } ?>
                 
 
-                <?php if($s->datum_apr != '0000-00-00 00:00:00'){?>
+                <?php if($s->datum_apr != '0000-00-00 00:00:00' && $s->datum_apr != null){?>
                 <td><?=date('d.m.Y', strtotime($s->datum_apr));?></td>
                 <?php }else {?>
                 <td></td>
